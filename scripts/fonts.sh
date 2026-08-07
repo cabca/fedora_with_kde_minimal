@@ -24,14 +24,14 @@ installMesloLGSNerdFontMono() {
     fi
 }
 
-installJetBrainsMono() {
+installJetBrainsMonoNerdFont() {
     FONT_NAME="JetBrainsMono Nerd Font"
     if fc-list :family | grep -iq "$FONT_NAME"; then
         printf "%b\n" "${GREEN}Font '$FONT_NAME' is already installed.${RC}"
     else
         printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'...${RC}"
         
-        FONT_URL="https://download.jetbrains.com/fonts/JetBrainsMono-2.304.zip"
+        FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.0/JetBrainsMono.zip"
         FONT_DIR="$HOME/.local/share/fonts"
         TEMP_DIR=$(mktemp -d)
         curl -sSLo "$TEMP_DIR"/"${FONT_NAME}".zip "$FONT_URL"
@@ -75,6 +75,6 @@ activateFontCacheServices() {
 }
 
 installMesloLGSNerdFontMono
-installJetBrainsMono
+installJetBrainsMonoNerdFont
 installTerminessNerdFont
 activateFontCacheServices
