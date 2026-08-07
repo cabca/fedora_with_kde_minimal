@@ -1,12 +1,15 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # -----------------------------------------------------------------------------
-# Development Environment Blueprint
+# Main install script
+# 
+# 
+# 
+# 
 # -----------------------------------------------------------------------------
+set -eu
 
-# =============================================================================
-# Development Tools & Languages
-# =============================================================================
+. ../install.sh
 
 installGit() {
     if ! rpm -q git >/dev/null 2>&1; then
@@ -29,10 +32,6 @@ installProgrammingLanguages() {
     fi
 }
 
-# =============================================================================
-# Infrastructure as Code (IaC)
-# =============================================================================
-
 installTerraform() {
     if ! command -v terraform >/dev/null 2>&1; then
         printf "%b\n" "${YELLOW}Adding HashiCorp repository and installing Terraform...${RC}"
@@ -53,10 +52,6 @@ installAnsible() {
         printf "%b\n" "${GREEN}Ansible is already installed.${RC}"
     fi
 }
-
-# =============================================================================
-# Containers & Orchestration Engines
-# =============================================================================
 
 installDockerPackages() {
     if ! command -v docker >/dev/null 2>&1; then
@@ -88,10 +83,6 @@ installPodman() {
         printf "%b\n" "${GREEN}Podman infrastructure already present.${RC}"
     fi
 }
-
-# =============================================================================
-# Kubernetes & GitOps Platform Delivery
-# =============================================================================
 
 installKubernetesTools() {
     # Check if kubectl binary or Helm is missing
@@ -145,10 +136,6 @@ installGitOpsCLIs() {
     fi
 }
 
-# =============================================================================
-# Development Environments & Clients
-# =============================================================================
-
 installVsCode() {
     if ! rpm -q code >/dev/null 2>&1; then
         printf "%b\n" "${YELLOW}Adding Visual Studio Code repository and installing...${RC}"
@@ -178,16 +165,6 @@ installZed() {
     fi
 }
 
-installGithubDesktop() {
-    if ! flatpak info io.github.shiftey.Desktop >/dev/null 2>&1; then
-        printf "%b\n" "${YELLOW}Deploying GitHub Desktop sandbox flatpak container...${RC}"
-        flatpak install -y flathub io.github.shiftey.Desktop
-        printf "%b\n" "${GREEN}GitHub Desktop sandbox linked successfully.${RC}"
-    else
-        printf "%b\n" "${GREEN}GitHub Desktop workspace already functional.${RC}"
-    fi
-}
-
 installJenkinsServer() {
     if ! rpm -q jenkins >/dev/null 2>&1; then
         printf "%b\n" "${YELLOW}Deploying Jenkins Engine CI Server LTS Repositories...${RC}"
@@ -213,10 +190,6 @@ startJenkinsServices() {
     fi
 }
 
-# =============================================================================
-# System Essential CLI Utilities
-# =============================================================================
-
 installCoreUtilities() {
     printf "%b\n" "${YELLOW}Refreshing base workspace developer utilities...${RC}"
     sudo dnf install -y \
@@ -225,9 +198,7 @@ installCoreUtilities() {
     printf "%b\n" "${GREEN}Base command-line utility configurations updated.${RC}"
 }
 
-# =============================================================================
-# Execution Sequencing Loop
-# =============================================================================
+
 installCoreUtilities
 installGit
 installProgrammingLanguages
@@ -240,7 +211,6 @@ installKubernetesTools
 installGitOpsCLIs
 installVsCode
 installZed
-installGithubDesktop
 installJenkinsServer
 startJenkinsServices
 

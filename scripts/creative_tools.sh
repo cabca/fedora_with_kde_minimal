@@ -1,5 +1,4 @@
-#!/bin/sh -e
-
+#!/bin/sh
 # -----------------------------------------------------------------------------
 # Multimedia & Content Creation Applications
 #
@@ -8,80 +7,90 @@
 # audacity         - Multi-track audio editor and recorder.
 # davinci-resolve  - Professional video editing, color correction, and audio post-production.
 # -----------------------------------------------------------------------------
+set -eu
 
-installGimp() {
-    if ! rpm -q gimp >/dev/null 2>&1; then
-        printf "%b\n" "${YELLOW}Installing GIMP...${RC}"
-        sudo dnf install -y gimp
-        printf "%b\n" "${GREEN}GIMP installed successfully.${RC}"
+. ../install.sh
+
+# install_dnf_package <rpm-name> [display-name]
+# Generic "is it installed, if not install it" wrapper so gimp/obs/audacity
+# don't each need their own copy-pasted function.
+install_dnf_package() {
+    pkg="$1"
+    label="${2:-$1}"
+
+    if rpm -q "$pkg" >/dev/null 2>&1; then
+        log_ok "${label} is already installed."
+        return 0
+    fi
+
+    log_info "Installing ${label}..."
+    if sudo dnf install -y "$pkg"; then
+        log_ok "${label} installed successfully."
     else
-        printf "%b\n" "${GREEN}GIMP is already installed.${RC}"
+        log_error "Failed to install ${label}."
+        return 1
     fi
 }
 
-installObsStudio() {
-    if ! rpm -q obs-studio >/dev/null 2>&1; then
-        printf "%b\n" "${YELLOW}Installing OBS Studio...${RC}"
-        sudo dnf install -y obs-studio
-        printf "%b\n" "${GREEN}OBS Studio installed successfully.${RC}"
-    else
-        printf "%b\n" "${GREEN}OBS Studio is already installed.${RC}"
+install_davinci_resolve() {
+    if [ -d /opt/resolve ]; then
+        log_ok "DaVinci Resolve application files detected in /opt/resolve."
+        return 0
     fi
+
+    log_info "Installing core system dependencies for DaVinci Resolve..."
+    if ! sudo dnf install -y apr apr-util mesa-libGLU libxcrypt-compat; then
+        log_error "Failed to install DaVinci Resolve dependencies."
+        return 1
+    fi
+
+    cat <<MSG
+${YELLOW}======================================================================${RC}
+${YELLOW}DaVinci Resolve requires manual licensing terms and direct download.${RC}
+${YELLOW}1. Download the Linux version from https://blackmagicdesign.com${RC}
+${YELLOW}2. Unzip and run the installer script via terminal using:${RC}
+${YELLOW}   sudo SKIP_PACKAGE_CHECK=1 ./DaVinci_Resolve_<version>_Linux.run${RC}
+${YELLOW}3. Rerun this script to safely apply necessary compatibility fixes.${RC}
+${YELLOW}======================================================================${RC}
+MSG
 }
 
-installAudacity() {
-    if ! rpm -q audacity >/dev/null 2>&1; then
-        printf "%b\n" "${YELLOW}Installing Audacity...${RC}"
-        sudo dnf install -y audacity
-        printf "%b\n" "${GREEN}Audacity installed successfully.${RC}"
-    else
-        printf "%b\n" "${GREEN}Audacity is already installed.${RC}"
+configure_davinci_resolve() {
+    resolve_libs="/opt/resolve/libs"
+
+    if [ ! -d "$resolve_libs" ]; then
+        log_info "Skipping DaVinci patches: ${resolve_libs} directory not found yet."
+        return 0
     fi
+
+    log_info "Configuring DaVinci Resolve shared library optimizations..."
+    sudo mkdir -p "${resolve_libs}/disabled-libraries"
+
+    # Target internal incompatible legacy libraries bundled with the
+    # application wrapper. Moving these forces Resolve to cleanly fall
+    # back to system native Fedora libraries.
+    moved=0
+    for lib in "${resolve_libs}"/libglib* "${resolve_libs}"/libgio* "${resolve_libs}"/libgmodule*; do
+        [ -f "$lib" ] || [ -L "$lib" ] || continue
+        if sudo mv "$lib" "${resolve_libs}/disabled-libraries/"; then
+            moved=$((moved + 1))
+        else
+            log_error "Failed to move $(basename "$lib") — check permissions."
+        fi
+    done
+
+    log_ok "DaVinci Resolve compatibility layers optimized (${moved} librar$([ "$moved" = 1 ] && echo y || echo ies) moved)."
 }
 
-installDavinciResolve() {
-    # Check if the core application binary directory or package metadata already exists
-    if [ ! -d "/opt/resolve" ]; then
-        printf "%b\n" "${YELLOW}Installing core system dependencies for DaVinci Resolve...${RC}"
-        
-        # Core libraries required by the installer package to boot or link properly
-        sudo dnf install -y apr apr-util mesa-libGLU libxcrypt-compat
-        
-        printf "%b\n" "${YELLOW}======================================================================${RC}"
-        printf "%b\n" "${YELLOW}DaVinci Resolve requires manual licensing terms and direct download.${RC}"
-        printf "%b\n" "${YELLOW}1. Download the Linux version from ://blackmagicdesign.com{RC}"
-        printf "%b\n" "${YELLOW}2. Unzip and run the installer script via terminal using:${RC}"
-        printf "%b\n" "${YELLOW}   sudo SKIP_PACKAGE_CHECK=1 ./DaVinci_Resolve_<version>_Linux.run${RC}"
-        printf "%b\n" "${YELLOW}3. Rerun this script to safely apply necessary compatibility fixes.${RC}"
-        printf "%b\n" "${YELLOW}======================================================================${RC}"
-    else
-        printf "%b\n" "${GREEN}DaVinci Resolve application files detected in /opt/resolve.${RC}"
-    fi
+main() {
+    require_cmd rpm
+    require_cmd dnf
+
+    install_dnf_package gimp GIMP
+    install_dnf_package obs-studio "OBS Studio"
+    install_dnf_package audacity Audacity
+    install_davinci_resolve
+    configure_davinci_resolve
 }
 
-configureDavinciResolve() {
-    if [ -d "/opt/resolve/libs" ]; then
-        printf "%b\n" "${YELLOW}Configuring DaVinci Resolve shared library optimizations...${RC}"
-        
-        # Target internal incompatible legacy libraries bundled with the application wrapper
-        # Moving these forces Resolve to cleanly fall back to system native Fedora libraries.
-        sudo mkdir -p /opt/resolve/libs/disabled-libraries
-        
-        cd /opt/resolve/libs
-        for lib in libglib* libgio* libgmodule*; do
-            if [ -f "$lib" ] || [ -L "$lib" ]; then
-                sudo mv "$lib" disabled-libraries/ 2>/dev/null || true
-            fi
-        done
-        
-        printf "%b\n" "${GREEN}DaVinci Resolve compatibility layers optimized successfully.${RC}"
-    else
-        printf "%b\n" "${YELLOW}Skipping DaVinci patches: /opt/resolve/libs directory not found yet.${RC}"
-    fi
-}
-
-installGimp
-installObsStudio
-installAudacity
-installDavinciResolve
-configureDavinciResolve
+main "$@"
