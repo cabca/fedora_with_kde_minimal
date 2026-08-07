@@ -1,14 +1,14 @@
 # System
-- OS: Fedora
+- Operating System: Fedora
+- Extra Repositories: RPM Fusion
 - Shell: Bash
 - Desktop Environment: KDE Plasma
 - Window Manager: KWin (Wayland)
 - Display Manager: SDDM
 - Audio Server: PipeWire
-- Bluetooth: Bluedevil
 - Network Manager: NetworkManager
-- Terminal: Alacritty
-- Extra repositories: RPM Fusion
+- Bluetooth: Bluedevil
+- Terminal Emulator: Alacritty
 - File Manager: Thunar
 - Fonts: MesloLGS Nerd Font Mono, JetBrainsMono Nerd Font, Terminess Nerd Font
 - Theme: Breeze (Dark) [Qt], Breeze-Dark [GTK2], Breeze [GTK3]
@@ -43,6 +43,7 @@
 - Jenkins
 
 # Virtualization Tools
+- QEMU
 - Virt-Manager
 - Bottles
 
@@ -65,8 +66,6 @@
 - Music player: Tidal
 
 # Game Tools
-- Steam
-- GOG
-- Proton
-- Lutris
-- GameScope
+- Launchers & Storefronts: Steam, Lutris, Heroic Games Launcher
+- Compatibility Layers: Wine, Proton, ProtonUp-Qt
+- Performance & Optimization Tools: GameScope, MangoHud
