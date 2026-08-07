@@ -1,2 +1,72 @@
-# fedora_with_kde_minimal
-Fedora configuration with minimal KDE setup
+# System
+- OS: Fedora
+- Shell: Bash
+- Desktop Environment: KDE Plasma
+- Window Manager: KWin (Wayland)
+- Display Manager: SDDM
+- Audio Server: PipeWire
+- Bluetooth: Bluedevil
+- Network Manager: NetworkManager
+- Terminal: Alacritty
+- Extra repositories: RPM Fusion
+- File Manager: Thunar
+- Fonts: MesloLGS Nerd Font Mono, JetBrainsMono Nerd Font, Terminess Nerd Font
+- Theme: Breeze (Dark) [Qt], Breeze-Dark [GTK2], Breeze [GTK3]
+- Icons: breeze-dark [Qt], breeze-dark [GTK2/3/4]
+- Cursor: breeze
+
+# Web Browsing Tools
+- Brave Origin
+- Firefox
+
+# Text Editor Tools
+- CLI: Nano
+- GUI: Gedit
+
+# IDE Tools
+- Visual Studio Code (VS Code)
+- Zed Editor
+- Neovim
+
+# Development Tools
+- Git
+- Programming Languages: GoLang, Python
+- Terraform
+- Ansible
+- Docker
+- Podman
+- Kubernetes
+- Helm
+- ArgoCD
+- Flux
+- Github CLI
+- Jenkins
+
+# Virtualization Tools
+- Virt-Manager
+- Bottles
+
+# Communication Tools
+- Business: Microsoft Teams, Slack, Zoom Workplace
+- Personal: Signal, ZapZap (WhatsApp)
+
+# Document Tools
+- LibreOffice
+- Okular
+
+# Creative Tools
+- OBS Studio
+- DaVinci Resolve
+- GIMP
+- Audacity
+
+# Media Player Tools
+- Video player: Celluloid
+- Music player: Tidal
+
+# Game Tools
+- Steam
+- GOG
+- Proton
+- Lutris
+- GameScope
